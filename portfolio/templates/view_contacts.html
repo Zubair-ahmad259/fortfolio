@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Submissions{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Contact Form Submissions</h1>
+        <a href="{% url 'home' %}" class="btn btn-outline">Back to Home</a>
+    </div>
+    
+    <div class="submissions-container">
+        {% for submission in submissions %}
+            {% if submission|length > 10 %}
+                <div class="submission-card">
+                    <pre style="background: #1a1a1a; color: #FFD700; padding: 20px; border-radius: 10px; overflow-x: auto;">{{ submission }}</pre>
+                </div>
+            {% endif %}
+        {% empty %}
+            <p>No submissions yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .submission-card {
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,215,0,0.2);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .submission-card pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .btn-outline {
+        padding: 10px 20px;
+        background: transparent;
+        color: #FFD700;
+        border: 2px solid #FFD700;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+        background: #FFD700;
+        color: #0a192f;
+    }
+</style>
+{% endblock %}

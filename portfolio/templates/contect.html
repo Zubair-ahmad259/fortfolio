@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZEPHYR - Contact Me{% endblock %}
+
+{% block content %}
+<!-- Contact Hero Section -->
+<section class="contact-hero">
+    <div class="container">
+        <div class="contact-hero-content" data-aos="fade-up">
+            <span class="section-tag">Get In Touch</span>
+            <h1 class="contact-title">Let's <span class="gold-text">Connect</span></h1>
+            <p class="contact-subtitle">Have a project in mind? Let's discuss how we can work together</p>
+        </div>
+    </div>
+    <div class="hero-background">
+        <div class="gradient-sphere"></div>
+        <div class="gradient-sphere-2"></div>
+    </div>
+</section>
+
+<!-- Contact Main Section -->
+<section class="contact-main">
+    <div class="container">
+        <div class="contact-grid">
+            <!-- Contact Information Cards -->
+            <div class="contact-info" data-aos="fade-right">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Email</h3>
+                        <p>zubair@zephyr.dev</p>
+                        <a href="mailto:zubair@zephyr.dev" class="info-link">Send a message <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Phone</h3>
+                        <p>+1 (555) 123-4567</p>
+                        <a href="tel:+15551234567" class="info-link">Call now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <h3>Location</h3>
+                        <p>San Francisco, CA</p>
+                        <span class="info-availability">Available for remote work</span>
+                    </div>
+                </div>
+
+                <div class="social-card">
+                    <h3>Follow Me</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-dev"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form-container" data-aos="fade-left">
+                <form class="contact-form" method="post" action="{% url 'contact' %}">
+                    {% csrf_token %}
+                    <h2 class="form-title">Send Me a Message</h2>
+                    <p class="form-subtitle">I'll get back to you within 24 hours</p>
+                    
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone (Optional)</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 234 567 890">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" class="form-control" placeholder="Project Inquiry" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" class="form-control" rows="6" placeholder="Tell me about your project..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-full">
+                        <span>Send Message</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Initialize AOS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script>
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100
+    });
+</script>
+
+<style>
+/* ===== CONTACT PAGE STYLES ===== */
+:root {
+    --navy-dark: #0a192f;
+    --navy-medium: #112240;
+    --navy-light: #1a2b4a;
+    --slate: #8892b0;
+    --light-slate: #a8b2d1;
+    --gold: #FFD700;
+    --transition: all 0.3s ease;
+}
+
+.contact-hero {
+    position: relative;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 0;
+    background: var(--navy-dark);
+    overflow: hidden;
+}
+
+.contact-hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.contact-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    color: var(--light-slate);
+    margin-bottom: 20px;
+}
+
+.gold-text {
+    background: linear-gradient(135deg, #FFD700, #FDB931);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.contact-subtitle {
+    font-size: 1.2rem;
+    color: var(--slate);
+}
+
+.contact-main {
+    padding: 80px 0;
+    background: var(--navy-medium);
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 40px;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.info-card {
+    background: var(--navy-light);
+    border-radius: 30px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid rgba(255,215,0,0.1);
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+}
+
+.info-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gold);
+}
+
+.info-content h3 {
+    color: var(--light-slate);
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.info-content p {
+    color: var(--slate);
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.info-link {
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.info-availability {
+    color: var(--gold);
+    font-size: 0.9rem;
+    background: rgba(255,215,0,0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.social-card {
+    background: var(--navy-light);
+    border-radius: 30px;
+    padding: 30px;
+    border: 1px solid rgba(255,215,0,0.1);
+}
+
+.social-card h3 {
+    color: var(--light-slate);
+    margin-bottom: 20px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.3rem;
+    transition: var(--transition);
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.social-link:hover {
+    background: var(--gold);
+    color: var(--navy-dark);
+    transform: translateY(-5px) rotate(360deg);
+}
+
+.contact-form-container {
+    background: var(--navy-light);
+    border-radius: 40px;
+    padding: 40px;
+    border: 1px solid rgba(255,215,0,0.1);
+}
+
+.form-title {
+    color: var(--light-slate);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.form-subtitle {
+    color: var(--slate);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+label {
+    display: block;
+    color: var(--light-slate);
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--navy-dark);
+    border: 2px solid rgba(255,215,0,0.1);
+    border-radius: 15px;
+    color: var(--light-slate);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+    padding: 16px !important;
+}
+
+@media (max-width: 992px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .contact-form-container {
+        padding: 30px 20px;
+    }
+}
+</style>
+{% endblock %}

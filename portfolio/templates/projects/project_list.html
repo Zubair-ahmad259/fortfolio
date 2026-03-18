@@ -1,0 +1,881 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ZEPHYR - My Projects{% endblock %}
+
+{% block content %}
+<!-- Projects Hero Section -->
+<section class="projects-hero">
+    <div class="container">
+        <div class="projects-hero-content" data-aos="fade-up">
+            <span class="section-tag">My Work</span>
+            <h1 class="projects-title">Featured <span class="gold-text">Projects</span></h1>
+            <p class="projects-subtitle">Explore my latest work and personal projects</p>
+        </div>
+    </div>
+    <div class="hero-background">
+        <div class="gradient-sphere"></div>
+        <div class="gradient-sphere-2"></div>
+    </div>
+</section>
+
+<!-- Projects Filter Section -->
+<section class="projects-filter-section">
+    <div class="container">
+        <div class="filter-container" data-aos="fade-up">
+            <button class="filter-btn active" data-filter="all">All Projects</button>
+            <button class="filter-btn" data-filter="web">Web Apps</button>
+            <button class="filter-btn" data-filter="django">Django</button>
+            <button class="filter-btn" data-filter="api">APIs</button>
+            <button class="filter-btn" data-filter="other">Others</button>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Grid Section -->
+<section class="projects-grid-section">
+    <div class="container">
+        <div class="projects-grid-modern">
+            {% for project in projects %}
+            <div class="project-card-modern" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'50' }}" data-category="{% if 'django' in project.technologies|lower %}django{% elif 'api' in project.technologies|lower %}api{% elif 'web' in project.technologies|lower %}web{% else %}other{% endif %}">
+                <div class="project-card-inner">
+                    <div class="project-card-front">
+                        <div class="project-image-wrapper">
+                            {% if project.image %}
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="project-image">
+                            {% else %}
+                            <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Project placeholder" class="project-image">
+                            {% endif %}
+                            <div class="project-image-overlay">
+                                <div class="project-category">
+                                    {% if 'django' in project.technologies|lower %}
+                                    <span class="category-badge">Django</span>
+                                    {% elif 'api' in project.technologies|lower %}
+                                    <span class="category-badge">API</span>
+                                    {% elif 'web' in project.technologies|lower %}
+                                    <span class="category-badge">Web App</span>
+                                    {% else %}
+                                    <span class="category-badge">Project</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="project-content">
+                            <h3 class="project-title">{{ project.title }}</h3>
+                            <p class="project-description">{{ project.description|truncatewords:15 }}</p>
+                            
+                            <div class="project-tech-stack">
+                                {% for tech in project.get_technologies_list|slice:":3" %}
+                                <span class="tech-pill">{{ tech }}</span>
+                                {% endfor %}
+                                {% if project.get_technologies_list|length > 3 %}
+                                <span class="tech-pill">+{{ project.get_technologies_list|length|add:"-3" }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="project-stats">
+                                <div class="stat">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span>{{ project.created_at|date:"Y" }}</span>
+                                </div>
+                                {% if project.url %}
+                                <div class="stat">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Live</span>
+                                </div>
+                                {% endif %}
+                                {% if project.github_url %}
+                                <div class="stat">
+                                    <i class="fab fa-github"></i>
+                                    <span>Source</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card-back">
+                        <div class="back-content">
+                            <h4>Technologies Used</h4>
+                            <div class="back-tech-list">
+                                {% for tech in project.get_technologies_list %}
+                                <span class="back-tech-item">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="back-links">
+                                <a href="{% url 'project_detail' project.id %}" class="back-link primary">
+                                    <span>View Details</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                                {% if project.github_url %}
+                                <a href="{{ project.github_url }}" class="back-link secondary" target="_blank">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                {% endif %}
+                                {% if project.url %}
+                                <a href="{{ project.url }}" class="back-link secondary" target="_blank">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state-projects" data-aos="fade-up">
+                <div class="empty-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>No Projects Yet</h3>
+                <p>Check back soon to see my latest work!</p>
+                {% if user.is_authenticated %}
+                <a href="/admin/projects/project/add/" class="btn-primary">Add Project</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if projects %}
+        <!-- Pagination -->
+        <div class="pagination-container" data-aos="fade-up">
+            <nav aria-label="Project navigation">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Project Stats Section -->
+{% if projects %}
+<section class="project-stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card" data-aos="fade-up">
+                <div class="stat-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="stat-number">{{ projects.count }}+</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-icon">
+                    <i class="fab fa-github"></i>
+                </div>
+                <div class="stat-number">
+                    {% with github_count=0 %}
+                        {% for project in projects %}
+                            {% if project.github_url %}
+                                {% with github_count=github_count|add:1 %}{% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ github_count }}+
+                    {% endwith %}
+                </div>
+                <div class="stat-label">Open Source</div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="stat-number">
+                    {% with live_count=0 %}
+                        {% for project in projects %}
+                            {% if project.url %}
+                                {% with live_count=live_count|add:1 %}{% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ live_count }}+
+                    {% endwith %}
+                </div>
+                <div class="stat-label">Live Demos</div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Happy Clients</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="projects-cta">
+    <div class="container">
+        <div class="cta-card" data-aos="zoom-in">
+            <h2>Have a Project in Mind?</h2>
+            <p>Let's collaborate and bring your ideas to life</p>
+            <a href="#" class="btn-primary btn-large">
+                <span>Start a Conversation</span>
+                <i class="fas fa-paper-plane"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Initialize AOS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script>
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100
+    });
+
+    // Filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectCards = document.querySelectorAll('.project-card-modern');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+
+                const filterValue = btn.getAttribute('data-filter');
+
+                projectCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }, 50);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.8)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<style>
+/* ===== PROJECTS PAGE SPECIFIC STYLES ===== */
+:root {
+    --navy-dark: #0a192f;
+    --navy-medium: #112240;
+    --navy-light: #1a2b4a;
+    --navy-lighter: #233554;
+    --slate: #8892b0;
+    --light-slate: #a8b2d1;
+    --gold: #FFD700;
+    --gold-light: #FFE55C;
+    --gold-dark: #FDB931;
+}
+
+/* ===== HERO SECTION ===== */
+.projects-hero {
+    position: relative;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 0;
+    background: var(--navy-dark);
+    overflow: hidden;
+}
+
+.projects-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.projects-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    color: var(--light-slate);
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.projects-subtitle {
+    font-size: 1.2rem;
+    color: var(--slate);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ===== FILTER SECTION ===== */
+.projects-filter-section {
+    padding: 40px 0 20px;
+    background: var(--navy-medium);
+}
+
+.filter-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.filter-btn {
+    padding: 12px 28px;
+    background: transparent;
+    border: 2px solid rgba(255,215,0,0.3);
+    color: var(--slate);
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.filter-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy-dark);
+    box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+}
+
+/* ===== PROJECTS GRID ===== */
+.projects-grid-section {
+    padding: 60px 0;
+    background: var(--navy-medium);
+}
+
+.projects-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.project-card-modern {
+    height: 450px;
+    perspective: 1500px;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.project-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.project-card-modern:hover .project-card-inner {
+    transform: rotateY(180deg);
+}
+
+.project-card-front, .project-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.project-card-front {
+    background: var(--navy-light);
+    border: 1px solid rgba(255,215,0,0.1);
+}
+
+.project-card-back {
+    background: var(--navy-light);
+    transform: rotateY(180deg);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-image-wrapper {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.project-card-modern:hover .project-image {
+    transform: scale(1.1);
+}
+
+.project-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(10,25,47,0.9), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+}
+
+.category-badge {
+    padding: 6px 15px;
+    background: var(--gold);
+    color: var(--navy-dark);
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.project-content {
+    padding: 25px;
+    text-align: left;
+}
+
+.project-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--light-slate);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.project-description {
+    color: var(--slate);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.project-tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tech-pill {
+    padding: 4px 12px;
+    background: rgba(255,215,0,0.1);
+    color: var(--gold);
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.project-stats {
+    display: flex;
+    gap: 20px;
+    border-top: 1px solid rgba(255,215,0,0.1);
+    padding-top: 15px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--slate);
+    font-size: 0.9rem;
+}
+
+.stat i {
+    color: var(--gold);
+}
+
+/* Back of card */
+.back-content {
+    padding: 30px;
+    text-align: center;
+}
+
+.back-content h4 {
+    color: var(--gold);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    position: relative;
+    display: inline-block;
+}
+
+.back-content h4::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 20px;
+}
+
+.back-tech-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.back-tech-item {
+    padding: 8px 16px;
+    background: rgba(255,215,0,0.1);
+    color: var(--light-slate);
+    border-radius: 30px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.back-links {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+}
+
+.back-link {
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.back-link.primary {
+    background: var(--gold);
+    color: var(--navy-dark);
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-link.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255,215,0,0.3);
+}
+
+.back-link.secondary {
+    width: 45px;
+    height: 45px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.2rem;
+    border: 1px solid rgba(255,215,0,0.3);
+}
+
+.back-link.secondary:hover {
+    background: var(--gold);
+    color: var(--navy-dark);
+    transform: translateY(-3px);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state-projects {
+    text-align: center;
+    padding: 80px;
+    background: var(--navy-light);
+    border-radius: 30px;
+    border: 1px solid rgba(255,215,0,0.1);
+    grid-column: 1 / -1;
+}
+
+.empty-state-projects .empty-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    background: var(--navy-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: var(--gold);
+    border: 2px dashed var(--gold);
+    animation: rotate 10s linear infinite;
+}
+
+.empty-state-projects h3 {
+    font-size: 2rem;
+    color: var(--light-slate);
+    margin-bottom: 15px;
+}
+
+.empty-state-projects p {
+    color: var(--slate);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+/* ===== STATS SECTION ===== */
+.project-stats-section {
+    padding: 60px 0;
+    background: var(--navy-dark);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.stat-card {
+    background: var(--navy-light);
+    padding: 40px 20px;
+    border-radius: 30px;
+    text-align: center;
+    border: 1px solid rgba(255,215,0,0.1);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+    box-shadow: 0 15px 30px rgba(255,215,0,0.15);
+}
+
+.stat-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--gold);
+    transition: var(--transition);
+}
+
+.stat-card:hover .stat-icon {
+    background: var(--gold);
+    color: var(--navy-dark);
+    transform: rotate(360deg);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--light-slate);
+    margin-bottom: 10px;
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--slate);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ===== PAGINATION ===== */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.pagination {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.page-item {
+    margin: 0;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background: var(--navy-light);
+    color: var(--slate);
+    border-radius: 15px;
+    text-decoration: none;
+    transition: var(--transition);
+    border: 1px solid rgba(255,215,0,0.1);
+    font-weight: 500;
+}
+
+.page-link:hover {
+    background: rgba(255,215,0,0.1);
+    color: var(--gold);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+}
+
+.page-item.active .page-link {
+    background: var(--gold);
+    color: var(--navy-dark);
+    border-color: var(--gold);
+}
+
+/* ===== CTA SECTION ===== */
+.projects-cta {
+    padding: 80px 0;
+    background: var(--navy-medium);
+}
+
+.cta-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 60px;
+    background: var(--navy-light);
+    border-radius: 50px;
+    text-align: center;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.cta-card h2 {
+    font-size: 2.5rem;
+    color: var(--light-slate);
+    margin-bottom: 15px;
+}
+
+.cta-card p {
+    color: var(--slate);
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.btn-large {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .projects-grid-modern {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .projects-grid-modern {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .filter-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-card {
+        padding: 40px 20px;
+    }
+    
+    .cta-card h2 {
+        font-size: 2rem;
+    }
+    
+    .empty-state-projects {
+        padding: 40px 20px;
+    }
+    
+    .empty-state-projects h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-card-modern {
+        height: 420px;
+    }
+    
+    .back-links {
+        flex-direction: column;
+    }
+    
+    .back-link.primary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}

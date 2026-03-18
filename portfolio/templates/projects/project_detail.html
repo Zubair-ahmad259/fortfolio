@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - ZEPHYR{% endblock %}
+
+{% block content %}
+<!-- Project Detail Section -->
+<section class="project-detail-section">
+    <div class="container">
+        <!-- Back Button -->
+        <div class="back-button" data-aos="fade-up">
+            <a href="{% url 'project_list' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Projects</span>
+            </a>
+        </div>
+
+        <!-- Project Header -->
+        <div class="project-header" data-aos="fade-up">
+            <h1 class="project-title">{{ project.title }}</h1>
+            <div class="project-meta">
+                <span class="project-date">
+                    <i class="far fa-calendar-alt"></i>
+                    {{ project.created_at|date:"F Y" }}
+                </span>
+                {% if project.featured %}
+                <span class="featured-badge">
+                    <i class="fas fa-star"></i>
+                    Featured Project
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Project Image -->
+        {% if project.image %}
+        <div class="project-main-image" data-aos="fade-up">
+            <img src="{{ project.image.url }}" alt="{{ project.title }}">
+        </div>
+        {% endif %}
+
+        <!-- Project Content Grid -->
+        <div class="project-content-grid">
+            <!-- Main Content -->
+            <div class="project-main-content" data-aos="fade-right">
+                <div class="content-card">
+                    <h2>Project Overview</h2>
+                    <p class="project-full-description">{{ project.description }}</p>
+
+                    <h2>Key Features</h2>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Responsive design for all devices</li>
+                        <li><i class="fas fa-check-circle"></i> Modern and clean UI/UX</li>
+                        <li><i class="fas fa-check-circle"></i> Optimized performance</li>
+                        <li><i class="fas fa-check-circle"></i> Secure authentication system</li>
+                        <li><i class="fas fa-check-circle"></i> Database integration</li>
+                    </ul>
+
+                    <h2>Technical Implementation</h2>
+                    <p>This project was built using modern web technologies and follows best practices for scalability and maintainability. The backend is powered by Django with a robust database structure, while the frontend provides a seamless user experience.</p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="project-sidebar" data-aos="fade-left">
+                <div class="sidebar-card">
+                    <h3>Technologies Used</h3>
+                    <div class="tech-list">
+                        {% for tech in project.get_technologies_list %}
+                        <span class="tech-badge-large">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>Project Links</h3>
+                    <div class="project-links-vertical">
+                        {% if project.url %}
+                        <a href="{{ project.url }}" class="project-link-btn primary" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Live Demo</span>
+                        </a>
+                        {% endif %}
+                        
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" class="project-link-btn secondary" target="_blank">
+                            <i class="fab fa-github"></i>
+                            <span>Source Code</span>
+                        </a>
+                        {% endif %}
+                        
+                        <a href="#" class="project-link-btn outline">
+                            <i class="fas fa-download"></i>
+                            <span>Download Case Study</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>Project Details</h3>
+                    <ul class="details-list">
+                        <li>
+                            <span class="detail-label">Category:</span>
+                            <span class="detail-value">Web Application</span>
+                        </li>
+                        <li>
+                            <span class="detail-label">Client:</span>
+                            <span class="detail-value">Internal Project</span>
+                        </li>
+                        <li>
+                            <span class="detail-label">Duration:</span>
+                            <span class="detail-value">3 months</span>
+                        </li>
+                        <li>
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value status-completed">Completed</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>Share Project</h3>
+                    <div class="share-links">
+                        <a href="#" class="share-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="share-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="share-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="share-link">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Projects -->
+        {% if related_projects %}
+        <div class="related-projects" data-aos="fade-up">
+            <h2 class="related-title">Related Projects</h2>
+            <div class="related-grid">
+                {% for related in related_projects %}
+                <div class="related-card">
+                    <div class="related-image">
+                        {% if related.image %}
+                        <img src="{{ related.image.url }}" alt="{{ related.title }}">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Project">
+                        {% endif %}
+                    </div>
+                    <div class="related-content">
+                        <h3>{{ related.title }}</h3>
+                        <a href="{% url 'project_detail' related.id %}" class="related-link">
+                            View Project <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+/* Project Detail Styles */
+.project-detail-section {
+    padding: 60px 0;
+    background: var(--navy-medium);
+    min-height: 100vh;
+}
+
+.back-button {
+    margin-bottom: 30px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--slate);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.back-link:hover {
+    color: var(--gold);
+    gap: 15px;
+}
+
+.project-header {
+    margin-bottom: 40px;
+}
+
+.project-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--light-slate);
+    margin-bottom: 15px;
+}
+
+.project-meta {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.project-date {
+    color: var(--slate);
+    font-size: 1rem;
+}
+
+.project-date i {
+    margin-right: 5px;
+    color: var(--gold);
+}
+
+.featured-badge {
+    background: rgba(255,215,0,0.1);
+    color: var(--gold);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.project-main-image {
+    margin-bottom: 50px;
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid rgba(255,215,0,0.1);
+}
+
+.project-main-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.project-content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.content-card {
+    background: var(--navy-light);
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid rgba(255,215,0,0.1);
+}
+
+.content-card h2 {
+    color: var(--light-slate);
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.content-card h2:not(:first-child) {
+    margin-top: 30px;
+}
+
+.project-full-description {
+    color: var(--slate);
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    color: var(--slate);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature-list i {
+    color: var(--gold);
+}
+
+.sidebar-card {
+    background: var(--navy-light);
+    border-radius: 30px;
+    padding: 30px;
+    border: 1px solid rgba(255,215,0,0.1);
+    margin-bottom: 25px;
+}
+
+.sidebar-card h3 {
+    color: var(--light-slate);
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.tech-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tech-badge-large {
+    background: rgba(255,215,0,0.1);
+    color: var(--gold);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.project-links-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.project-link-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.project-link-btn.primary {
+    background: var(--gold);
+    color: var(--navy-dark);
+}
+
+.project-link-btn.secondary {
+    background: rgba(255,215,0,0.1);
+    color: var(--gold);
+    border: 1px solid rgba(255,215,0,0.3);
+}
+
+.project-link-btn.outline {
+    background: transparent;
+    color: var(--slate);
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.project-link-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255,215,0,0.2);
+}
+
+.project-link-btn.secondary:hover {
+    background: var(--gold);
+    color: var(--navy-dark);
+}
+
+.project-link-btn.outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.details-list {
+    list-style: none;
+    padding: 0;
+}
+
+.details-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.details-list li:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--slate);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--light-slate);
+}
+
+.status-completed {
+    color: #4CAF50;
+}
+
+.share-links {
+    display: flex;
+    gap: 12px;
+}
+
+.share-link {
+    width: 45px;
+    height: 45px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    transition: var(--transition);
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.share-link:hover {
+    background: var(--gold);
+    color: var(--navy-dark);
+    transform: translateY(-3px);
+}
+
+.related-projects {
+    margin-top: 60px;
+}
+
+.related-title {
+    color: var(--light-slate);
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.related-card {
+    background: var(--navy-light);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,215,0,0.1);
+    transition: var(--transition);
+}
+
+.related-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+}
+
+.related-image {
+    height: 150px;
+    overflow: hidden;
+}
+
+.related-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.related-content {
+    padding: 15px;
+}
+
+.related-content h3 {
+    color: var(--light-slate);
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.related-link {
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+@media (max-width: 992px) {
+    .project-content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .related-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .related-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .content-card {
+        padding: 25px;
+    }
+}
+</style>
+{% endblock %}
