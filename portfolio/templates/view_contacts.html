@@ -1,54 +1,233 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Contact Submissions{% endblock %}
+{% block title %}Contact Submissions - Admin{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Contact Form Submissions</h1>
-        <a href="{% url 'home' %}" class="btn btn-outline">Back to Home</a>
+        <div>
+            <h1>📬 Contact Form Submissions</h1>
+            <p class="text-muted">Admin only - {{ total_count }} message(s) received</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn-outline">Back to Home</a>
     </div>
-    
-    <div class="submissions-container">
+
+    {% if submissions and submissions.0 != 'No submissions yet' %}
         {% for submission in submissions %}
             {% if submission|length > 10 %}
-                <div class="submission-card">
-                    <pre style="background: #1a1a1a; color: #FFD700; padding: 20px; border-radius: 10px; overflow-x: auto;">{{ submission }}</pre>
+            <div class="submission-card">
+                <div class="submission-header">
+                    <span class="submission-number">Message #{{ forloop.revcounter }}</span>
+                    <span class="submission-badge">New</span>
                 </div>
+                <div class="submission-content">
+                    {% for line in submission.splitlines %}
+                        {% if 'Name:' in line %}
+                            <div class="info-row"><strong>👤 {{ line }}</strong></div>
+                        {% elif 'Email:' in line %}
+                            <div class="info-row"><strong>📧 {{ line }}</strong></div>
+                        {% elif 'Phone:' in line %}
+                            <div class="info-row"><strong>📞 {{ line }}</strong></div>
+                        {% elif 'Subject:' in line %}
+                            <div class="info-row"><strong>📌 {{ line }}</strong></div>
+                        {% elif 'Date:' in line %}
+                            <div class="info-row"><strong>🕐 {{ line }}</strong></div>
+                        {% elif 'Message:' in line %}
+                            <div class="message-title"><strong>💬 {{ line }}</strong></div>
+                        {% elif '==' not in line and '---' not in line and line.strip %}
+                            <div class="message-text">{{ line }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="submission-footer">
+                    <button class="reply-btn" onclick="copyToClipboard('{{ submission }}')">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="reply-btn" onclick="openMailto()">
+                        <i class="fas fa-reply"></i> Reply
+                    </button>
+                </div>
+            </div>
             {% endif %}
-        {% empty %}
-            <p>No submissions yet.</p>
         {% endfor %}
-    </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3>No Messages Yet</h3>
+            <p>Contact form submissions will appear here when users send messages.</p>
+            <p class="text-muted small">Test it by submitting a message from your contact page!</p>
+        </div>
+    {% endif %}
 </div>
 
 <style>
-    .submission-card {
-        margin-bottom: 20px;
-        border: 1px solid rgba(255,215,0,0.2);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .submission-card pre {
-        margin: 0;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-    
-    .btn-outline {
-        padding: 10px 20px;
-        background: transparent;
-        color: #FFD700;
-        border: 2px solid #FFD700;
-        border-radius: 30px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-outline:hover {
-        background: #FFD700;
-        color: #0a192f;
-    }
+.submission-card {
+    background: var(--navy-light);
+    border-radius: 20px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    border: 1px solid rgba(255,215,0,0.2);
+    transition: var(--transition);
+}
+
+.submission-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 10px 30px rgba(255,215,0,0.15);
+}
+
+.submission-header {
+    background: rgba(255,215,0,0.1);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+}
+
+.submission-number {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.submission-badge {
+    background: var(--gold);
+    color: var(--navy-dark);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.submission-content {
+    padding: 25px;
+}
+
+.info-row {
+    padding: 8px 0;
+    color: var(--light-slate);
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+}
+
+.message-title {
+    margin-top: 15px;
+    padding: 10px 0 5px;
+    color: var(--gold);
+    font-size: 1rem;
+}
+
+.message-text {
+    padding: 15px;
+    background: var(--navy-dark);
+    border-radius: 15px;
+    color: var(--slate);
+    line-height: 1.6;
+    margin-top: 5px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+.submission-footer {
+    padding: 15px 25px;
+    background: rgba(255,215,0,0.05);
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid rgba(255,215,0,0.1);
+}
+
+.reply-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reply-btn:hover {
+    background: var(--gold);
+    color: var(--navy-dark);
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px;
+    background: var(--navy-light);
+    border-radius: 30px;
+    border: 1px solid rgba(255,215,0,0.1);
+}
+
+.empty-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    background: var(--navy-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--gold);
+    border: 2px dashed var(--gold);
+}
+
+.empty-state h3 {
+    font-size: 1.8rem;
+    color: var(--light-slate);
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    color: var(--slate);
+    margin-bottom: 10px;
+}
+
+.btn-outline {
+    padding: 10px 25px;
+    background: transparent;
+    color: var(--gold);
+    border: 2px solid var(--gold);
+    border-radius: 30px;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-block;
+}
+
+.btn-outline:hover {
+    background: var(--gold);
+    color: var(--navy-dark);
+    transform: translateY(-2px);
+}
 </style>
+
+<script>
+function copyToClipboard(text) {
+    // Extract email for reply
+    const emailMatch = text.match(/Email: (\S+@\S+)/);
+    if (emailMatch) {
+        const email = emailMatch[1];
+        navigator.clipboard.writeText(email);
+        alert('Email copied: ' + email);
+    } else {
+        navigator.clipboard.writeText(text);
+        alert('Message copied to clipboard!');
+    }
+}
+
+function openMailto() {
+    // This will be improved to get the actual email
+    alert('Reply feature: You can reply directly from your email client');
+}
+</script>
 {% endblock %}

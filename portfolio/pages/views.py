@@ -1,3 +1,5 @@
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from projects.models import Project
@@ -109,10 +111,17 @@ def contact(request):
         return render(request, 'contect.html')
     
     return render(request, 'contect.html')
-from django.contrib.admin.views.decorators import staff_member_required
+    from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+import os
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required  # Add this line
+from django.contrib.auth.decorators import login_required  # Add this line
+from projects.models import Project
+from datetime import datetime
+import os
 
-# Option A: Using decorator (recommended)
 @staff_member_required
 def view_contacts(request):
     """View all contact submissions (admin only)"""
@@ -120,8 +129,20 @@ def view_contacts(request):
     try:
         with open('all_contacts.txt', 'r', encoding='utf-8') as f:
             content = f.read()
-            submissions = content.split('='*50)
+            # Split by separator and filter out empty strings
+            raw_submissions = content.split('='*50)
+            # Process each submission to make it readable
+            for sub in raw_submissions:
+                if sub.strip():
+                    submissions.append(sub.strip())
     except FileNotFoundError:
         submissions = ['No submissions yet']
     
-    return render(request, 'view_contacts.html', {'submissions': submissions})
+    # Reverse to show newest first
+    submissions.reverse()
+    
+    context = {
+        'submissions': submissions,
+        'total_count': len(submissions)
+    }
+    return render(request, 'view_contacts.html', context)
