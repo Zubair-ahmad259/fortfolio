@@ -721,10 +721,18 @@
                        <li class="nav-item">
                         <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">About</a>
                     </li>
+
                   <li class="nav-item">
     <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'contact' %}">Contact</a>
    </li>
-
+<!-- 
+   {% if user.is_authenticated and user.is_staff %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'add_project_form' %}">
+        <i class="fas fa-plus-circle"></i> Add Project
+    </a>
+</li>
+{% endif %} -->
                 </ul>
             </div>
         </div>
