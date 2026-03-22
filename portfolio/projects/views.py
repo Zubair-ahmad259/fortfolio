@@ -3,7 +3,6 @@ from django.core.paginator import Paginator
 from .models import Project
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from datetime import datetime
 
 def add_project_form(request):
     """Simple form to add projects to database (admin only)"""
@@ -37,9 +36,10 @@ def save_project(request):
         project.save()
         
         messages.success(request, f'Project "{title}" added successfully to DATABASE!')
-        return redirect('project_list')
+        return redirect('project_list')  # Redirect to projects list page
     
     return redirect('add_project_form')
+
 def project_list(request):
     """Display all projects from database with pagination"""
     projects_list = Project.objects.all().order_by('-created_at')
