@@ -4,70 +4,44 @@ from .models import Project
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from datetime import datetime
-import os
-import json
 
 def add_project_form(request):
-    """Simple form to add projects (admin only)"""
+    """Simple form to add projects to database (admin only)"""
     return render(request, 'projects/add_project.html')
 
 @staff_member_required
 def save_project(request):
-    """Save project to file (no database)"""
+    """Save project to DATABASE"""
     if request.method == 'POST':
         title = request.POST.get('title', '')
         description = request.POST.get('description', '')
         technologies = request.POST.get('technologies', '')
         url = request.POST.get('url', '')
         github_url = request.POST.get('github_url', '')
+        featured = request.POST.get('featured') == 'on'
         
-        # Create projects directory if it doesn't exist
-        projects_dir = 'projects_data'
-        if not os.path.exists(projects_dir):
-            os.makedirs(projects_dir)
+        # Create and save to DATABASE
+        project = Project(
+            title=title,
+            description=description,
+            technologies=technologies,
+            url=url,
+            github_url=github_url,
+            featured=featured
+        )
         
-        # Save to JSON file
-        project_data = {
-            'id': datetime.now().strftime('%Y%m%d_%H%M%S'),
-            'title': title,
-            'description': description,
-            'technologies': technologies,
-            'url': url,
-            'github_url': github_url,
-            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'featured': request.POST.get('featured') == 'on'
-        }
+        # Handle image upload if present
+        if 'image' in request.FILES:
+            project.image = request.FILES['image']
         
-        # Read existing projects
-        all_projects_file = 'all_projects.json'
-        if os.path.exists(all_projects_file):
-            with open(all_projects_file, 'r', encoding='utf-8') as f:
-                all_projects = json.load(f)
-        else:
-            all_projects = []
+        project.save()
         
-        # Add new project
-        all_projects.append(project_data)
-        
-        # Save back
-        with open(all_projects_file, 'w', encoding='utf-8') as f:
-            json.dump(all_projects, f, indent=2, ensure_ascii=False)
-        
-        messages.success(request, f'Project "{title}" added successfully!')
-        return redirect('add_project_form')
+        messages.success(request, f'Project "{title}" added successfully to DATABASE!')
+        return redirect('project_list')
     
     return redirect('add_project_form')
-
-def get_all_projects():
-    """Helper function to get all projects from file"""
-    all_projects_file = 'all_projects.json'
-    if os.path.exists(all_projects_file):
-        with open(all_projects_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return []
-
 def project_list(request):
-    """Display all projects with pagination"""
+    """Display all projects from database with pagination"""
     projects_list = Project.objects.all().order_by('-created_at')
     
     # Pagination - show 6 projects per page
@@ -85,10 +59,11 @@ def project_detail(request, project_id):
     """Display single project details"""
     project = get_object_or_404(Project, id=project_id)
     
-    # Get related projects (same technology or category)
+    # Get related projects
+    tech = project.technologies.split(',')[0].strip() if project.technologies else ''
     related_projects = Project.objects.exclude(id=project_id).filter(
-        technologies__icontains=project.technologies.split(',')[0].strip()
-    )[:3]
+        technologies__icontains=tech
+    )[:3] if tech else []
     
     context = {
         'project': project,
